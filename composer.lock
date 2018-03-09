@@ -1,0 +1,55 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "7120817294efaa3169cfbbc6d32803ad",
+    "packages": [
+        {
+            "name": "jsnlib/rand",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fdjkgh580/jsnlib-rand.git",
+                "reference": "3a9270bbf73b94c7c05e83bce765918a429d4ee2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fdjkgh580/jsnlib-rand/zipball/3a9270bbf73b94c7c05e83bce765918a429d4ee2",
+                "reference": "3a9270bbf73b94c7c05e83bce765918a429d4ee2",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.2.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Jsnlib\\": "src\\"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "keywords": [
+                "array",
+                "arrayobject",
+                "convert",
+                "object"
+            ],
+            "time": "2018-03-09T09:03:53+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": {
+        "php": ">=5.2.4"
+    },
+    "platform-dev": []
+}
