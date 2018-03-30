@@ -61,6 +61,5 @@ catch (Exception $e)
 <form method="post" enctype="multipart/form-data" action="">
     <div>訣竅：無論單比或多筆都使用name="upl[]"</div>
     <div><input name="upl[]" type="file" multiple></div>
-    <div><input name="upl[]" type="file" multiple></div>
     <div><input name="go" type="submit" value="送出"></div>
 </form>

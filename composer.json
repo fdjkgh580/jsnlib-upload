@@ -2,10 +2,10 @@
     "name": "jsnlib/upload",
     "type": "library",
     "description": "",
-    "keywords": ["array", "object", "convert", "ArrayObject"],
+    "keywords": ["file", "upload", "multi"],
     "license": "MIT",
     "require": {
-        "php": ">=5.2.4",
+        "php": ">=7.0.0",
         "jsnlib/rand": ">=1.0.0"
     },
     "autoload": {
