@@ -2,7 +2,7 @@
     "name": "jsnlib/upload",
     "type": "library",
     "description": "",
-    "keywords": ["file", "upload", "multi"],
+    "keywords": ["image", "file", "resize", "upload", "multi"],
     "license": "MIT",
     "require": {
         "php": ">=7.0.0",
