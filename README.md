@@ -1,7 +1,7 @@
 # jsnlib-upload
 簡單快速的上傳檔案
 
-## 自動上傳，系統自動命名
+## 方法一、自動上傳，系統自動命名
 1. 先建立表單，並指定 input 屬性為 multiple
 ````html
 <form method="post" enctype="multipart/form-data" action="">
@@ -86,7 +86,7 @@ Array
 )
 ````
 
-## 手動上傳，並可自行指定對應命名
+## 方法二、手動上傳，並可自行指定對應命名
 1. 先建立表單，name 的部分命名為陣列
 ````php
 <form method="post" enctype="multipart/form-data" action="">
