@@ -53,6 +53,7 @@ class Upload
         {
             $filenameExt = strtolower($filenameExt);
         }
+
         //小寫
         return $filenameExt;
     }
@@ -181,8 +182,6 @@ class Upload
         //取得真實路徑
         $realpath = realpath($this->site);
 
-        //
-
         if (!is_writable($realpath))
         {
             $perms = fileperms($realpath); //權限值10進位
@@ -218,7 +217,8 @@ class Upload
             return "0";
         }
 
-        $this->arraykey += 1; //
+        $this->arraykey += 1;
+
         return "1";
     }
 
@@ -268,7 +268,6 @@ class Upload
                 throw new \Exception("不允許的檔案型態 : {$original_file}");
             }
         }
-
                                                                        //3.檔案大小
         $filesize = $_FILES[$filename]['size'][$arykey] / 1000 / 1000; //上傳大小
         $setsize  = $this->size;                                       //指定大小
@@ -373,7 +372,6 @@ class Upload
         $returnbox = [];
 
         //$val為原始上傳的文件名稱，若要將檔名使用原始檔名，建議配合uniqid()
-
         foreach ($_FILES[$this->filename]["name"] as $fkey => $val)
         {
             if ($this->isNextKey($val))
@@ -428,7 +426,6 @@ class Upload
         $back['path']     = $this->mixPathAndFilename();
 
         // 若指定網址
-
         if (isset($url))
         {
             $back['url'] = trim($url, "\ /") . "/" . $this->mixPathAndFilename();
@@ -457,7 +454,6 @@ class Upload
         $this->uploadStart(); //開始上傳
 
         //調整圖片大小(已寫自動判定格式)
-
         if ($resizeImg == 1)
         {
             $Scpath   = $this->resizeImageScriptPath; //套件路徑
