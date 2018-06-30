@@ -41,7 +41,7 @@ class Upload
     }
 
     //上傳檔案的副檔名  $Lower=1全部轉成小寫
-    private function filenameExtension($lower = 0)
+    public function filenameExtension($lower = 0)
     {
         $arykey      = $this->arraykey;
         $name        = $this->filename;
@@ -211,7 +211,7 @@ class Upload
     }
 
     //遇到未指定上傳檔案的就換下一個<input>
-    private function isNextKey($key)
+    public function isNextKey($key)
     {
         if (!empty($key))
         {
