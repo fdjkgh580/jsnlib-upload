@@ -26,7 +26,7 @@ try
         $result = $U->fileupload(
         [
             'prefix' => 'MY',
-            'url' => 'http://localhost/jsnlib/Upload/Demo',
+            'url' => 'http://localhost/edit_my_jsnlib_system/jsnlib-upload/Demo/',
             'sizelist' => 
             [
                 [
