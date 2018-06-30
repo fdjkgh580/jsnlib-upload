@@ -35,7 +35,7 @@ class Upload
     }
     
     //錯誤代碼
-    private function error_val()
+    private function getErrorCode()
     {
         $filename   =   $this->filename;
         $arykey     =   $this->arraykey;
@@ -43,19 +43,19 @@ class Upload
     }
         
     //上傳檔案的副檔名  $Lower=1全部轉成小寫
-    private function scandN($lower=0)
+    private function filenameExtension($lower=0)
     {
         $arykey     =   $this->arraykey;
         $name       =   $this->filename;
         $name       =   $_FILES[$name]['name'][$arykey];
-        $scandN     =   strrchr($name, ".");                    //最後出現的後方字串
-        $scandN     =   ltrim($scandN,".");
-        if ($lower == "1") $scandN = strtolower($scandN);       //小寫
-        return $scandN;
+        $filenameExt     =   strrchr($name, ".");                    //最後出現的後方字串
+        $filenameExt     =   ltrim($filenameExt,".");
+        if ($lower == "1") $filenameExt = strtolower($filenameExt);       //小寫
+        return $filenameExt;
     }
         
     //檢查副檔名的黑名單 
-    private function chk_blacklist()
+    private function checkBlackList()
     {
 
         //分解字串放入陣列
@@ -64,10 +64,10 @@ class Upload
             $ary        =   explode(",", $str);
             
             //比對上傳的副檔名
-            $scandN     =   $this->scandN(1);
+            $filenameExt     =   $this->filenameExtension(1);
             
             foreach ($ary as $chkval) {
-                if ($scandN ==  $chkval) {
+                if ($filenameExt ==  $chkval) {
                     return 0;
                     break;
                     }
@@ -77,18 +77,17 @@ class Upload
     }   
         
         
-    //檢查允許的副檔名
-    private function chk_whitelist()
+    //檢查允許的白名單
+    private function checkWhiteList()
     {
-        
         //分解字串放入陣列
         $str        =   $this->could_secondname;
         $ary        =   explode(",", $str);
         
         //比對上傳的副檔名
-        $scandN     =   $this->scandN(1);
+        $filenameExt     =   $this->filenameExtension(1);
         foreach ($ary as $chkval) {
-            if ($scandN ==  $chkval){
+            if ($filenameExt ==  $chkval){
                 return 1;
                 break;
                 }
@@ -96,8 +95,8 @@ class Upload
         return 0;
     }   
     
-    //檢查大小
-    private function chk_size()
+    //檢查檔案大小
+    private function checkFileSize()
     {
         $name       =   $this->filename;
         $arykey     =   $this->arraykey;
@@ -108,7 +107,7 @@ class Upload
     }
     
     //驗證檔案的指定型態
-    private function chk_type($needtype)
+    private function checkFileType($needtype)
     {
         $name   =   $this->filename;
         $arykey =   $this->arraykey;
@@ -119,7 +118,7 @@ class Upload
         return 1;
     }   
 
-    private function create_folder($site)
+    private function createFolder($site)
     {
         $ary        =   explode("/",$site);
         $filter_ary = array_filter($ary);
@@ -140,13 +139,13 @@ class Upload
 
 
     //準備好路徑
-    private function setuplpath()
+    private function setUplPath()
     {
 
         //指定路徑若不存在，就分解並依序往下檢查、建立路徑(資料夾)
         if ( !file_exists($this->site))
         {
-            $this->create_folder($this->site);
+            $this->createFolder($this->site);
         }       
 
         //取得真實路徑
@@ -166,7 +165,7 @@ class Upload
     }
     
     //讓字串結尾保持 「 / 」 
-    private function auto_endslash($string)
+    private function keepEndSlash($string)
     {
 
         $endstr     =   substr($string, -1);
@@ -180,7 +179,7 @@ class Upload
         
     
     //遇到未指定上傳檔案的就換下一個<input> 
-    private function isnextkey($key)
+    private function isNextKey($key)
     {
         if (!empty($key)) return "0";
         $this->arraykey += 1; //
@@ -189,14 +188,14 @@ class Upload
         
     
     //驗證所有問題
-    private function chk_all()
+    private function checkAllError()
     {
         $filename           =   $this->filename;
         $arykey             =   $this->arraykey;
         $original_file      =   $_FILES[$filename]['name'][$arykey]; //原始檔名+附檔名
 
         //1.檢查錯誤代碼
-        $error  =   $this->error_val();
+        $error  =   $this->getErrorCode();
         
         if ($error  !=  0)  
         {
@@ -212,8 +211,8 @@ class Upload
         //2.檢查附檔名黑、白名單
         $bla            =   $this->blacklist;
         $whi            =   $this->could_secondname;
-        $blacklist      =   $this->chk_blacklist();
-        $whitelist      =   $this->chk_whitelist();
+        $blacklist      =   $this->checkBlackList();
+        $whitelist      =   $this->checkWhiteList();
         
         
         
@@ -235,28 +234,28 @@ class Upload
         //3.檔案大小
         $filesize   =   $_FILES[$filename]['size'][$arykey] / 1000 / 1000;  //上傳大小
         $setsize    =   $this->size;                                    //指定大小
-        $size       =   $this->chk_size();
+        $size       =   $this->checkFileSize();
         if ($size == 0) throw new \Exception("您的『{$original_file}』檔案大小： {$filesize} MB；超過指定大小 : {$setsize} MB");
         
         //4.準備好存放路徑
-        $this->setuplpath();
+        $this->setUplPath();
         
         //100.檢驗完成
         return 1;
     }
     
     //組合路徑與檔案完整名稱的字串
-    private function mix_path_file()
+    private function mixPathAndFilename()
     {
         //指定位置
         $newname    =   $this->newname;
         //檢查並自動幫site結尾補上/ 
-        $this->site =   $this->auto_endslash($this->site);
+        $this->site =   $this->keepEndSlash($this->site);
         return $this->site . $newname;
     }
     
     //開始上傳 
-    private function start_upload()
+    private function uploadStart()
     {
         //來源
         $name       =   $this->filename;
@@ -264,7 +263,7 @@ class Upload
         $filetemp   =   $_FILES[$name]['tmp_name'][$arykey];
         
         //上傳完整路徑
-        $site       =   $this->mix_path_file();
+        $site       =   $this->mixPathAndFilename();
         
         if (copy($filetemp,$site)) return 1;
 
@@ -272,7 +271,7 @@ class Upload
     }
         
     //結束上傳  
-    private function end_upload()
+    private function uploadEnd()
     {
         //清空暫存檔
         $name       =   $this->filename;
@@ -287,10 +286,10 @@ class Upload
     {
         include_once($ImageResizeScriptPath);
         
-        $chktype    =   $this->chk_type("image");
+        $chktype    =   $this->checkFileType("image");
         if ($chktype == 0) throw new \Exception("檔案非圖片格式類型，不可調整大小");
         
-        $site   =   $this->mix_path_file();
+        $site   =   $this->mixPathAndFilename();
         $neww   =   $this->resize_width;
         $newh   =   $this->resize_height;
         $retype =   $this->resize_type;
@@ -319,7 +318,7 @@ class Upload
         //$val為原始上傳的文件名稱，若要將檔名使用原始檔名，建議配合uniqid() 
         foreach ($_FILES[$this->filename]["name"] as $fkey => $val) 
         {
-            if ($this->isnextkey($val)) continue; //不限數量 (遇到未指定的就換下一個<input>)
+            if ($this->isNextKey($val)) continue; //不限數量 (遇到未指定的就換下一個<input>)
 
             $N = $prefix . "_" . $rand->get(4, "2") . "_" . time();
 
@@ -327,22 +326,22 @@ class Upload
             {
                 $endupload = (!isset($sizelist[$key + 1])) ? "clean" : "retain";
 
-                $newname = $N . "_" . $info['size'] . "." . $this->scandN(1);
+                $newname = $N . "_" . $info['size'] . "." . $this->filenameExtension(1);
                 $this->resize_width  = $info['width'];
                 $this->resize_height = $info['height'];
                 $this->fileupload_multi($newname, $this->arraykey, 1, $endupload);
 
                 // 回傳格式
-                $back = $this->back_format($param['url']);
+                $back = $this->backFormat($param['url']);
 
                 $returnbox[$fkey][$info['size']] = $back;
             }
             else 
             {
-                $this->newname = $N . "." . $this->scandN(1);
+                $this->newname = $N . "." . $this->filenameExtension(1);
 
                 // 回傳格式
-                $back = $this->back_format($param['url']);
+                $back = $this->backFormat($param['url']);
 
                 $returnbox[$fkey] = $back;
             }
@@ -351,19 +350,19 @@ class Upload
         return $returnbox;
     }
 
-    private function back_format($url)
+    private function backFormat($url)
     {
         if (empty($this->newname)) throw new \Exception('未指定新的檔名');
 
         // 回傳格式
         $back             = [];
         $back['filename'] = $this->newname;
-        $back['path']     = $this->mix_path_file();
+        $back['path']     = $this->mixPathAndFilename();
 
         // 若指定網址
         if (isset($url))
         {
-            $back['url'] = trim($url, "\ /") . "/" . $this->mix_path_file();
+            $back['url'] = trim($url, "\ /") . "/" . $this->mixPathAndFilename();
         }
 
         return $back;
@@ -382,10 +381,10 @@ class Upload
         $this->newname              =   $newname;                   //建議：新檔名(時間+鍵值+副檔名)
 
         //驗證無誤?
-        $prepare    =   $this->chk_all();
+        $prepare    =   $this->checkAllError();
         if ($prepare != 1) return 0;
         
-        $this->start_upload();                                      //開始上傳
+        $this->uploadStart();                                      //開始上傳
         
         //調整圖片大小(已寫自動判定格式)
         if ($resizeImg == 1) 
@@ -408,7 +407,7 @@ class Upload
         
         if ($endupload == "clean") 
         {
-            $success    =   $this->end_upload();                        //清空暫存
+            $success    =   $this->uploadEnd();                        //清空暫存
             $this->arraykey = $add_arraykey +1;                         //接著準備上傳下一個<input>吧
             return $success;
         }
