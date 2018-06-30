@@ -10,7 +10,7 @@ class Upload
 
     //黑白名單擇一使用, 通常使用白名單自訂允許的檔案會比較安全
     public  $blacklist;                 //黑名單的副檔明,  用逗號分開
-    public  $could_secondname;          //允許的副檔名,       用逗號分開
+    public  $allow_type;                //允許的副檔名,       用逗號分開
     
     public  $size;                      //指定大小 
     public  $site;                      //上傳路徑(相對)
@@ -45,11 +45,11 @@ class Upload
     //上傳檔案的副檔名  $Lower=1全部轉成小寫
     private function filenameExtension($lower=0)
     {
-        $arykey     =   $this->arraykey;
-        $name       =   $this->filename;
-        $name       =   $_FILES[$name]['name'][$arykey];
-        $filenameExt     =   strrchr($name, ".");                    //最後出現的後方字串
-        $filenameExt     =   ltrim($filenameExt,".");
+        $arykey      =   $this->arraykey;
+        $name        =   $this->filename;
+        $name        =   $_FILES[$name]['name'][$arykey];
+        $filenameExt =   strrchr($name, "."); //最後出現的後方字串
+        $filenameExt =   ltrim($filenameExt,".");
         if ($lower == "1") $filenameExt = strtolower($filenameExt);       //小寫
         return $filenameExt;
     }
@@ -57,22 +57,25 @@ class Upload
     //檢查副檔名的黑名單 
     private function checkBlackList()
     {
-
         //分解字串放入陣列
-        $str        =   $this->blacklist;
-        if (!empty($str)) {
-            $ary        =   explode(",", $str);
+        $str = $this->blacklist;
+        
+        if (!empty($str)) 
+        {
+            $ary = explode(",", $str);
             
             //比對上傳的副檔名
-            $filenameExt     =   $this->filenameExtension(1);
+            $filenameExt = $this->filenameExtension(1);
             
-            foreach ($ary as $chkval) {
-                if ($filenameExt ==  $chkval) {
+            foreach ($ary as $chkval) 
+            {
+                if ($filenameExt ==  $chkval) 
+                {
                     return 0;
                     break;
-                    }
-                }           
-            }       
+                }
+            }           
+        }       
         return 1;
     }   
         
@@ -81,17 +84,21 @@ class Upload
     private function checkWhiteList()
     {
         //分解字串放入陣列
-        $str        =   $this->could_secondname;
+        $str        =   $this->allow_type;
         $ary        =   explode(",", $str);
         
         //比對上傳的副檔名
         $filenameExt     =   $this->filenameExtension(1);
-        foreach ($ary as $chkval) {
-            if ($filenameExt ==  $chkval){
+
+        foreach ($ary as $chkval) 
+        {
+            if ($filenameExt ==  $chkval)
+            {
                 return 1;
                 break;
-                }
-            }           
+            }
+        }
+
         return 0;
     }   
     
@@ -120,9 +127,10 @@ class Upload
 
     private function createFolder($site)
     {
-        $ary        =   explode("/",$site);
-        $filter_ary = array_filter($ary);
+        $ary         =   explode("/",$site);
+        $filter_ary  = array_filter($ary);
         $prev_folder = null;
+
         if (is_array($filter_ary)) foreach ($filter_ary as $key => $folder)
         {
             $create_folder = empty($prev_folder) ? $folder : $prev_folder . "/{$folder}";
@@ -167,17 +175,16 @@ class Upload
     //讓字串結尾保持 「 / 」 
     private function keepEndSlash($string)
     {
-
         $endstr     =   substr($string, -1);
         $token      =   "/";
-        if ($endstr == $token) {
+        if ($endstr == $token) 
+        {
             unset($token);
             return $string;
         }
-        return $string.$token;
+        return $string . $token;
     }
         
-    
     //遇到未指定上傳檔案的就換下一個<input> 
     private function isNextKey($key)
     {
@@ -185,7 +192,6 @@ class Upload
         $this->arraykey += 1; //
         return "1";
     }
-        
     
     //驗證所有問題
     private function checkAllError()
@@ -210,11 +216,9 @@ class Upload
         
         //2.檢查附檔名黑、白名單
         $bla            =   $this->blacklist;
-        $whi            =   $this->could_secondname;
+        $whi            =   $this->allow_type;
         $blacklist      =   $this->checkBlackList();
         $whitelist      =   $this->checkWhiteList();
-        
-        
         
         if (!empty($bla) and !empty($whi))
         {
@@ -249,8 +253,10 @@ class Upload
     {
         //指定位置
         $newname    =   $this->newname;
+
         //檢查並自動幫site結尾補上/ 
         $this->site =   $this->keepEndSlash($this->site);
+
         return $this->site . $newname;
     }
     
@@ -277,6 +283,7 @@ class Upload
         $name       =   $this->filename;
         $arykey     =   $this->arraykey;
         $filetemp   =   $_FILES[$name]['tmp_name'][$arykey];
+
         unlink($filetemp);
         return 1;
     }   
