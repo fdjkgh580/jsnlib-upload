@@ -3,24 +3,24 @@ namespace Jsnlib;
 
 class Upload
 {
-    public $filename; //input的name屬性陣列名稱 ex. input="upl[]"   的 upl
-    public $arraykey; //input的name屬性鍵值 ex. input="upl[0]"  的 0
+    public $filename;   //input的name屬性陣列名稱 ex. input="upl[]"   的 upl
+    public $arraykey;   //input的name屬性鍵值 ex. input="upl[0]"  的 0
     public $pathaccess; //路徑中或資料夾的權限 ex.0755 或最高0777
 
-    //黑白名單擇一使用, 通常使用白名單自訂允許的檔案會比較安全
-    public $blacklist; //黑名單的副檔明, 用逗號分開
+                        //黑白名單擇一使用, 通常使用白名單自訂允許的檔案會比較安全
+    public $blacklist;  //黑名單的副檔明, 用逗號分開
     public $allow_type; //允許的副檔名, 用逗號分開
 
-    public $size; //指定大小
-    public $site; //上傳路徑(相對)
+    public $size;    //指定大小
+    public $site;    //上傳路徑(相對)
     public $newname; //新檔名
 
-    //套件ImageResize 調整圖片大小相關設定
+                                   //套件ImageResize 調整圖片大小相關設定
     public $resizeImageScriptPath; //套件ImageResize 路徑
-    public $resize_width; //圖片重新調整寬
-    public $resize_height; //圖片重新調整高
-    public $resize_type; //套件ImageResize 縮放的類型(預設1) 不然有一邊會超過大小, 特殊使用 or 根據最大長度來判斷(可保證在指定大小內))
-    public $resize_quality; //壓縮品質 (預設100)
+    public $resize_width;          //圖片重新調整寬
+    public $resize_height;         //圖片重新調整高
+    public $resize_type;           //套件ImageResize 縮放的類型(預設1) 不然有一邊會超過大小, 特殊使用 or 根據最大長度來判斷(可保證在指定大小內))
+    public $resize_quality;        //壓縮品質 (預設100)
 
     public function __construct()
     {
@@ -186,8 +186,8 @@ class Upload
         if (!is_writable($realpath))
         {
             $perms = fileperms($realpath); //權限值10進位
-            $perms = decoct($perms); //10進未轉8進位
-            $perms = substr($perms, -4); //取得後方4位的權值
+            $perms = decoct($perms);       //10進未轉8進位
+            $perms = substr($perms, -4);   //取得後方4位的權值
 
             throw new \Exception("不可寫入：{$this->site}，權值是：{$perms}");
         }
@@ -269,9 +269,9 @@ class Upload
             }
         }
 
-        //3.檔案大小
+                                                                       //3.檔案大小
         $filesize = $_FILES[$filename]['size'][$arykey] / 1000 / 1000; //上傳大小
-        $setsize  = $this->size; //指定大小
+        $setsize  = $this->size;                                       //指定大小
         $size     = $this->checkFileSize();
 
         if ($size == 0)
@@ -483,7 +483,7 @@ class Upload
         if ($endupload == "clean")
         {
             $success        = $this->uploadEnd(); //清空暫存
-            $this->arraykey = $add_arraykey + 1; //接著準備上傳下一個<input>吧
+            $this->arraykey = $add_arraykey + 1;  //接著準備上傳下一個<input>吧
             return $success;
         }
     }
