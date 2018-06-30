@@ -309,7 +309,7 @@ class Upload
 	function fileupload($param)
 	{
 		$rand      = new \Jsnlib\Rand;
-		$sizelist  = $param['sizelist'];
+		$sizelist  = isset($param['sizelist']) ? $param['sizelist'] : false;
 		$prefix    = isset($param['prefix']) ? $param['prefix'] : $rand->get(4, "2");
 		$returnbox = [];
 
@@ -320,7 +320,7 @@ class Upload
 
 			$N = $prefix . "_" . $rand->get(4, "2") . "_" . time();
 
-			foreach ($sizelist as $key => $info)
+			if ($sizelist != false) foreach ($sizelist as $key => $info)
 			{
 				$endupload = (!isset($sizelist[$key + 1])) ? "clean" : "retain";
 
@@ -330,22 +330,42 @@ class Upload
 				$this->fileupload_multi($newname, $this->arraykey, 1, $endupload);
 
 				// 回傳格式
-				$back             = [];
-				$back['filename'] = $newname;
-				$back['path']     = $this->site . $newname;
-				
-				// 若指定網址
-				if (isset($param['url']))
-				{
-					$back['url'] = trim($param['url'], "\ /") . "/" . $this->site . $newname;
-				}
+				$back = $this->back_format($param['url']);
 
 				$returnbox[$fkey][$info['size']] = $back;
+			}
+			else 
+			{
+				$this->newname = $N . "." . $this->scandN(1);
+
+				// 回傳格式
+				$back = $this->back_format($param['url']);
+
+				$returnbox[$fkey] = $back;
 			}
 		}
 
 		return $returnbox;
 	}
+
+	private function back_format($url)
+	{
+		if (empty($this->newname)) throw new \Exception('未指定新的檔名');
+
+		// 回傳格式
+		$back             = [];
+		$back['filename'] = $this->newname;
+		$back['path']     = $this->mix_path_file();
+
+		// 若指定網址
+		if (isset($url))
+		{
+			$back['url'] = trim($url, "\ /") . "/" . $this->mix_path_file();
+		}
+
+		return $back;
+	}
+	
 	
 		
 	//傳遞參數陣列
