@@ -10,7 +10,7 @@ class Format
      * @param  string  $url 帶入指定網址，可以是非上傳的實際路徑
      * @return array
      */
-    public static function back($newname, $path, $url = null)
+    public function back($newname, $path, $url = null)
     {
         if (empty($newname))
         {

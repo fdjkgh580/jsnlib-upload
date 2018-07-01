@@ -23,6 +23,7 @@ class Upload
     public $resize_quality;        //壓縮品質 (預設100)
 
     protected $check;
+    protected $format;
 
     public function __construct()
     {
@@ -33,15 +34,8 @@ class Upload
         $this->resize_type    = 1;
         $this->resize_quality = 100;
         $this->check          = new \Jsnlib\Upload\Check();
+        $this->format         = new \Jsnlib\Upload\Format();
     }
-
-    // //錯誤代碼
-    // private function getErrorCode()
-    // {
-    //     $filename = $this->filename;
-    //     $arykey   = $this->arraykey;
-    //     return $_FILES[$filename]['error'][$arykey];
-    // }
 
     //上傳檔案的副檔名  $Lower=1全部轉成小寫
     public function filenameExtension($lower = 0)
@@ -106,70 +100,6 @@ class Upload
 
         return "1";
     }
-
-    // //驗證所有問題
-    // private function checkAllError()
-    // {
-    //     $filename      = $this->filename;
-    //     $arykey        = $this->arraykey;
-    //     $original_file = $_FILES[$filename]['name'][$arykey]; //原始檔名+附檔名
-
-    //     //1.檢查錯誤代碼
-    //     $error = $this->getErrorCode();
-
-    //     if ($error != 0)
-    //     {
-    //         switch ($error)
-    //         {
-    //             case 4:
-    //                 throw new \Exception("請選擇檔案");
-    //                 break;
-    //         }
-
-    //         throw new \Exception("上傳錯誤，代碼:{$error}");
-    //     }
-
-    //     //2.檢查附檔名黑、白名單
-    //     $bla       = $this->blacklist;
-    //     $whi       = $this->allow_type;
-    //     $blacklist = $this->checkBlackList();
-    //     $whitelist = $this->checkWhiteList();
-
-    //     if (!empty($bla) and !empty($whi))
-    //     {
-    //         throw new \Exception("黑、白名單請擇一設置。");
-    //     }
-    //     elseif (!empty($bla))
-    //     {
-    //         if ($blacklist == 0)
-    //         {
-    //             throw new \Exception("不允許的檔案型態 : {$original_file}");
-    //         }
-    //     }
-    //     elseif (!empty($whi))
-    //     {
-    //         if ($whitelist == 0)
-    //         {
-    //             throw new \Exception("不允許的檔案型態 : {$original_file}");
-    //         }
-    //     }
-
-    //                                                                    //3.檔案大小
-    //     $filesize = $_FILES[$filename]['size'][$arykey] / 1000 / 1000; //上傳大小
-    //     $setsize  = $this->size;                                       //指定大小
-    //     $size     = $this->checkFileSize();
-
-    //     if ($size == 0)
-    //     {
-    //         throw new \Exception("您的『{$original_file}』檔案大小： {$filesize} MB；超過指定大小 : {$setsize} MB");
-    //     }
-
-    //     //4.準備好存放路徑
-    //     $this->setUplPath();
-
-    //     //100.檢驗完成
-    //     return 1;
-    // }
 
     //組合路徑與檔案完整名稱的字串
     private function mixPathAndFilename()
@@ -285,7 +215,7 @@ class Upload
                     $this->fileuploadMulti($newname, $this->arraykey, 1, $endupload);
 
                     // 回傳格式
-                    $back = \Jsnlib\Upload\Format::back(
+                    $back = $this->format->back(
                         $this->newname,
                         $this->mixPathAndFilename(),
                         $param['url']
@@ -319,7 +249,7 @@ class Upload
                 $this->uploadEnd();
 
                 // 回傳格式
-                $back = \Jsnlib\Upload\Format::back(
+                $back = $this->format->back(
                     $this->newname,
                     $this->mixPathAndFilename(),
                     $param['url']
