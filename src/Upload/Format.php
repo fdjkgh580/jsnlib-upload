@@ -33,15 +33,15 @@ class Format
 
     public function newNameString($prefix)
     {
-        $this->rand           = new \Jsnlib\Rand();
-        
+        $this->rand = new \Jsnlib\Rand();
+
         return $prefix . "_" . $this->rand->get(4, [2])[0] . "_" . time();
     }
 
     /**
      * 組合路徑與檔案完整名稱的字串
-     * @param   $newname 
-     * @param   $site    指定位置
+     * @param $newname
+     * @param $site    指定位置
      */
     public function mixPathAndFilename($newname, $site)
     {

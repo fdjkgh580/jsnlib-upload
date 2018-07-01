@@ -4,24 +4,24 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "7120817294efaa3169cfbbc6d32803ad",
+    "content-hash": "0fc88a25907bcdd0d607de5697dc41c8",
     "packages": [
         {
             "name": "jsnlib/rand",
-            "version": "1.0.0",
+            "version": "1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fdjkgh580/jsnlib-rand.git",
-                "reference": "3a9270bbf73b94c7c05e83bce765918a429d4ee2"
+                "reference": "e3363f12176fa0291c86b30356ee593bd69315e4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fdjkgh580/jsnlib-rand/zipball/3a9270bbf73b94c7c05e83bce765918a429d4ee2",
-                "reference": "3a9270bbf73b94c7c05e83bce765918a429d4ee2",
+                "url": "https://api.github.com/repos/fdjkgh580/jsnlib-rand/zipball/e3363f12176fa0291c86b30356ee593bd69315e4",
+                "reference": "e3363f12176fa0291c86b30356ee593bd69315e4",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.2.4"
+                "php": ">=7.0.0"
             },
             "type": "library",
             "autoload": {
@@ -35,11 +35,10 @@
             ],
             "keywords": [
                 "array",
-                "arrayobject",
-                "convert",
-                "object"
+                "object",
+                "rand"
             ],
-            "time": "2018-03-09T09:03:53+00:00"
+            "time": "2018-03-30T02:04:56+00:00"
         }
     ],
     "packages-dev": [],
@@ -49,7 +48,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=5.2.4"
+        "php": ">=7.0.0"
     },
     "platform-dev": []
 }

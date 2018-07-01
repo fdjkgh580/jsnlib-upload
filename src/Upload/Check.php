@@ -77,7 +77,6 @@ class Check
         }
     }
 
-
     /**
      * 驗證所有問題
      * @param $param['filename']
@@ -104,11 +103,9 @@ class Check
 
         // 檢查允許或不允許的名單
         $this->inList($orgFileName, $filenameExt, $blacklist, $allowlist);
-        
+
         //檔案大小
         $this->size($filename, $arykey, $setSize, $orgFileName);
-
-        
 
         // 準備好存放路徑
         $this->setUplPath($site);
