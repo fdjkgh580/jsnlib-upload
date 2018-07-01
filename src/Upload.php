@@ -402,7 +402,11 @@ class Upload
                     $this->fileuploadMulti($newname, $this->arraykey, 1, $endupload);
 
                     // 回傳格式
-                    $back = $this->backFormat($param['url']);
+                    $back = \Jsnlib\Upload\Format::back(
+                        $this->newname,
+                        $this->mixPathAndFilename(),
+                        $param['url']
+                    );
 
                     $returnbox[$fkey][$info['size']] = $back;
                 }
@@ -428,39 +432,17 @@ class Upload
                 $this->uploadEnd();
 
                 // 回傳格式
-                $back = $this->backFormat($param['url']);
+                $back = \Jsnlib\Upload\Format::back(
+                    $this->newname,
+                    $this->mixPathAndFilename(),
+                    $param['url']
+                );
 
                 $returnbox[$fkey] = $back;
             }
         }
 
         return $returnbox;
-    }
-
-    /**
-     * 上傳成功回傳的格式
-     * @param  string  $url 帶入指定網址，可以是非上傳的實際路徑
-     * @return array
-     */
-    private function backFormat($url)
-    {
-        if (empty($this->newname))
-        {
-            throw new \Exception('未指定新的檔名');
-        }
-
-        // 回傳格式
-        $back             = [];
-        $back['filename'] = $this->newname;
-        $back['path']     = $this->mixPathAndFilename();
-
-        // 若指定網址
-        if (isset($url))
-        {
-            $back['url'] = trim($url, "\ /") . "/" . $this->mixPathAndFilename();
-        }
-
-        return $back;
     }
 
     /**
