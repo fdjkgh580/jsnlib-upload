@@ -7,9 +7,9 @@ class Upload
     public $arraykey;   //input的name屬性鍵值 ex. input="upl[0]"  的 0
     public $pathaccess; //路徑中或資料夾的權限 ex.0755 或最高0777
 
-                        //黑白名單擇一使用, 通常使用白名單自訂允許的檔案會比較安全
-    public $blacklist;  //黑名單的副檔明, 用逗號分開
-    public $allow_type; //允許的副檔名, 用逗號分開
+                       //黑白名單擇一使用, 通常使用白名單自訂允許的檔案會比較安全
+    public $blacklist; //黑名單的副檔名, 用逗號分開
+    public $allowlist; //允許的副檔名, 用逗號分開
 
     public $size;    //指定大小
     public $site;    //上傳路徑(相對)
@@ -134,7 +134,7 @@ class Upload
                 'filename'    => $this->filename,
                 'arykey'      => $this->arraykey,
                 'blacklist'   => $this->blacklist,
-                'allow_type'  => $this->allow_type,
+                'allowlist'   => $this->allowlist,
                 'filenameExt' => $this->format->filenameExtension($this->filename, $this->arraykey),
                 'setSize'     => $this->size,
                 'site'        => $this->site,
@@ -209,7 +209,7 @@ class Upload
                 'filename'    => $this->filename,
                 'arykey'      => $this->arraykey,
                 'blacklist'   => $this->blacklist,
-                'allow_type'  => $this->allow_type,
+                'allowlist'   => $this->allowlist,
                 'filenameExt' => $this->format->filenameExtension($this->filename, $this->arraykey),
                 'setSize'     => $this->size,
                 'site'        => $this->site,

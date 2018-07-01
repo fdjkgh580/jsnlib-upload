@@ -14,8 +14,8 @@ try
         $inputname                = "upl";                       //設定input file 的名稱, upl代表了 name="upl[]"
         $U->filename              = $inputname;                  //input name屬性的陣列名稱
         $U->arraykey              = 0;                           //input name陣列鍵值(起始值)
-        $U->allow_type            = "jpg,png";                   //允許副檔名
-        // $U->blacklist             = "jpg,sql";                   //
+        $U->allowlist             = "jpg";                   //允許副檔名
+        $U->blacklist             = null;                        //
         $U->pathaccess            = "0777";                      //路徑權限
         $U->size                  = 20;                          //MB
         $U->site                  = "images";                    //上傳路徑，結尾口有可無 /
@@ -28,19 +28,19 @@ try
             [
                 'prefix'   => 'MY',
                 'url'      => 'http://localhost/edit_my_jsnlib_system/jsnlib-upload/Demo/',
-                'sizelist' =>
-                [
-                    [
-                        'size'   => "S",
-                        'width'  => 150,
-                        'height' => 150,
-                    ],
-                    [
-                        'size'   => "M",
-                        'width'  => 800,
-                        'height' => 800,
-                    ],
-                ],
+                // 'sizelist' =>
+                // [
+                //     [
+                //         'size'   => "S",
+                //         'width'  => 150,
+                //         'height' => 150,
+                //     ],
+                //     [
+                //         'size'   => "M",
+                //         'width'  => 800,
+                //         'height' => 800,
+                //     ],
+                // ],
 
             ]);
 

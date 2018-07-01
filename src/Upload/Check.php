@@ -29,7 +29,7 @@ class Check
      * @param $param['filename']
      * @param $param['arykey']
      * @param $param['blacklist']
-     * @param $param['allow_type']
+     * @param $param['allowlist']
      * @param $param['filenameExt']
      * @param $param['setSize']
      * @param $param['site']
@@ -64,9 +64,9 @@ class Check
         $isInBlackList = $this->isInBlackList($filenameExt, $blacklist);
 
         // 在白名單？
-        $isInAllowType = $this->isInAllowType($filenameExt, $allow_type);
+        $isInAllowType = $this->isInAllowType($filenameExt, $allowlist);
 
-        if (!empty($blacklist) and !empty($allow_type))
+        if (!empty($blacklist) and !empty($allowlist))
         {
             throw new \Exception("黑、白名單請擇一設置。");
         }
@@ -76,7 +76,7 @@ class Check
             throw new \Exception("不允許的檔案型態 : {$orgFileName}");
         }
         // 若不在白名單中
-        elseif (!empty($allow_type) and $isInAllowType === false)
+        elseif (!empty($allowlist) and $isInAllowType === false)
         {
             throw new \Exception("不允許的檔案型態 : {$orgFileName}");
         }
@@ -183,13 +183,13 @@ class Check
 
     /**
      * 檢查允許的白名單
-     * @param string $filenameExt  比對上傳的副檔名
-     * @param string $allow_type
+     * @param string $filenameExt 比對上傳的副檔名
+     * @param string $allowlist
      */
-    private function isInAllowType($filenameExt, $allow_type)
+    private function isInAllowType($filenameExt, $allowlist)
     {
         //分解字串放入陣列
-        $ary = explode(",", $allow_type);
+        $ary = explode(",", $allowlist);
 
         //比對上傳的副檔名
         foreach ($ary as $chkval)
