@@ -9,7 +9,7 @@ class Check
      * 驗證檔案的指定型態
      * @param $filename
      * @param $arykey
-     * @param $needType 要符合的型態
+     * @param $needType   要符合的型態
      */
     public function fileType($filename, $arykey, $needType)
     {
@@ -65,8 +65,6 @@ class Check
 
         // 在白名單？
         $isInAllowType = $this->isInAllowType($filenameExt, $allow_type);
-
-        // var_dump($isInBlackList);die;
 
         if (!empty($blacklist) and !empty($allow_type))
         {

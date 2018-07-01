@@ -157,7 +157,6 @@ class Upload
 
         $returnbox[$fkey] = $back;
     }
-    
 
     /**
      * 依照尺寸自動上傳，並自動命名
@@ -171,9 +170,10 @@ class Upload
     {
         $sizelist  = isset($param['sizelist']) ? $param['sizelist'] : false;
         $prefix    = isset($param['prefix']) ? $param['prefix'] : $this->rand->get(4, "2");
+        $url       = $param['url'];
         $returnbox = [];
 
-        $this->eachFiles(function ($fkey, $org_filename) use ($param, $sizelist, $prefix, &$returnbox)
+        $this->eachFiles(function ($fkey, $org_filename) use ($url, $sizelist, $prefix, &$returnbox)
         {
             //不限數量 (遇到未指定的就換下一個<input>)
             $nameString = $this->format->newNameString($prefix);
@@ -181,13 +181,12 @@ class Upload
             // 若有指定縮小列表
             if (is_array($sizelist))
             {
-                $this->resizeImage($fkey, $nameString, $param['url'], $returnbox, $sizelist);
+                $this->resizeImage($fkey, $nameString, $url, $returnbox, $sizelist);
                 return true;
             }
 
             // 一般檔案上傳
-            $this->simpleFile($fkey, $nameString, $param['url'], $returnbox);
-
+            $this->simpleFile($fkey, $nameString, $url, $returnbox);
         });
 
         return $returnbox;
@@ -200,7 +199,7 @@ class Upload
      * @param integer $resizeImg    是否啟用縮圖
      * @param string  $endupload    對於暫存檔的使用。clean為清空、retain為保留
      */
-    public function fileuploadMulti($newname, $add_arraykey, $resizeImg = 0, $endupload)
+    private function fileuploadMulti($newname, $add_arraykey, $resizeImg = 0, $endupload)
     {
         $this->newname = $newname; //建議：新檔名(時間+鍵值+副檔名)
 
