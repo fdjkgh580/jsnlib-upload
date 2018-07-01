@@ -52,7 +52,7 @@ class Upload
     }
 
     //開始上傳
-    private function uploadStart()
+    private function start()
     {
         //來源
         $name     = $this->filename;
@@ -69,14 +69,14 @@ class Upload
 
         if (copy($filetemp, $site))
         {
-            return 1;
+            return true;
         }
 
-        throw new \Exception("上傳錯誤: copy({$filetemp}, {$site})也有可能是上傳的路徑沒有權限寫入。"); //使用copy事後須刪除
+        throw new \Exception("上傳錯誤: copy({$filetemp}, {$site})，也有可能是上傳的路徑沒有權限寫入。"); //使用copy事後須刪除
     }
 
     //結束上傳
-    private function uploadEnd()
+    private function end()
     {
         //清空暫存檔
         $name     = $this->filename;
@@ -84,7 +84,21 @@ class Upload
         $filetemp = $_FILES[$name]['tmp_name'][$arykey];
 
         unlink($filetemp);
-        return 1;
+        return true;
+    }
+
+    private function eachFiles($callback)
+    {
+        // $org_filename 為原始上傳的文件名稱，若要將檔名使用原始檔名，建議配合uniqid()
+        foreach ($_FILES[$this->filename]["name"] as $fkey => $org_filename)
+        {
+            if ($this->isNextKey($org_filename))
+            {
+                continue;
+            }
+
+            $callback($fkey, $org_filename);
+        }
     }
 
     /**
@@ -102,14 +116,8 @@ class Upload
         $prefix    = isset($param['prefix']) ? $param['prefix'] : $rand->get(4, "2");
         $returnbox = [];
 
-        // $org_filename 為原始上傳的文件名稱，若要將檔名使用原始檔名，建議配合uniqid()
-        foreach ($_FILES[$this->filename]["name"] as $fkey => $org_filename)
+        $this->eachFiles(function ($fkey, $org_filename) use ($param, $rand, $sizelist, $prefix, &$returnbox)
         {
-            if ($this->isNextKey($org_filename))
-            {
-                continue;
-            }
-
             //不限數量 (遇到未指定的就換下一個<input>)
             $N = $prefix . "_" . $rand->get(4, "2") . "_" . time();
 
@@ -153,10 +161,10 @@ class Upload
                 $tmp = $_FILES['upl']['tmp_name'][0];
 
                 //開始上傳
-                $this->uploadStart();
+                $this->start();
 
                 //清空暫存
-                $this->uploadEnd();
+                $this->end();
 
                 // 回傳格式
                 $back = $this->format->back(
@@ -167,7 +175,7 @@ class Upload
 
                 $returnbox[$fkey] = $back;
             }
-        }
+        });
 
         return $returnbox;
     }
@@ -195,7 +203,7 @@ class Upload
                 'site'        => $this->site,
             ]);
 
-        $this->uploadStart(); //開始上傳
+        $this->start(); //開始上傳
 
         //調整圖片大小(已寫自動判定格式)
         if ($resizeImg == 1)
@@ -232,8 +240,8 @@ class Upload
 
         if ($endupload == "clean")
         {
-            $success        = $this->uploadEnd(); //清空暫存
-            $this->arraykey = $add_arraykey + 1;  //接著準備上傳下一個<input>吧
+            $success        = $this->end();      //清空暫存
+            $this->arraykey = $add_arraykey + 1; //接著準備上傳下一個<input>吧
             return $success;
         }
     }
