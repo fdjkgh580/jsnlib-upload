@@ -22,6 +22,8 @@ class Upload
     public $resize_type;           //套件ImageResize 縮放的類型(預設1) 不然有一邊會超過大小, 特殊使用 or 根據最大長度來判斷(可保證在指定大小內))
     public $resize_quality;        //壓縮品質 (預設100)
 
+    protected $check;
+
     public function __construct()
     {
         $this->arraykey       = 0;
@@ -30,15 +32,16 @@ class Upload
         $this->resize_height  = "1000";
         $this->resize_type    = 1;
         $this->resize_quality = 100;
+        $this->check          = new \Jsnlib\Upload\Check();
     }
 
-    //錯誤代碼
-    private function getErrorCode()
-    {
-        $filename = $this->filename;
-        $arykey   = $this->arraykey;
-        return $_FILES[$filename]['error'][$arykey];
-    }
+    // //錯誤代碼
+    // private function getErrorCode()
+    // {
+    //     $filename = $this->filename;
+    //     $arykey   = $this->arraykey;
+    //     return $_FILES[$filename]['error'][$arykey];
+    // }
 
     //上傳檔案的副檔名  $Lower=1全部轉成小寫
     public function filenameExtension($lower = 0)
@@ -60,70 +63,6 @@ class Upload
         return $filenameExt;
     }
 
-    //檢查副檔名的黑名單
-    private function checkBlackList()
-    {
-        //分解字串放入陣列
-        $str = $this->blacklist;
-
-        if (!empty($str))
-        {
-            $ary = explode(",", $str);
-
-            //比對上傳的副檔名
-            $filenameExt = $this->filenameExtension(1);
-
-            foreach ($ary as $chkval)
-            {
-                if ($filenameExt == $chkval)
-                {
-                    return 0;
-                    break;
-                }
-            }
-        }
-
-        return 1;
-    }
-
-    //檢查允許的白名單
-    private function checkWhiteList()
-    {
-        //分解字串放入陣列
-        $str = $this->allow_type;
-        $ary = explode(",", $str);
-
-        //比對上傳的副檔名
-        $filenameExt = $this->filenameExtension(1);
-
-        foreach ($ary as $chkval)
-        {
-            if ($filenameExt == $chkval)
-            {
-                return 1;
-                break;
-            }
-        }
-
-        return 0;
-    }
-
-    //檢查檔案大小
-    private function checkFileSize()
-    {
-        $name     = $this->filename;
-        $arykey   = $this->arraykey;
-        $setsize  = $this->size * 1000 * 1000; //MB
-        $filesize = $_FILES[$name]['size'][$arykey];
-
-        if ($filesize > $setsize)
-        {
-            return 0;
-        }
-
-        return 1;
-    }
-
     //驗證檔案的指定型態
     private function checkFileType($needtype)
     {
@@ -135,62 +74,6 @@ class Upload
         if ($type != $needtype)
         {
             return 0;
-        }
-
-        return 1;
-    }
-
-    private function createFolder($site)
-    {
-        $ary         = explode("/", $site);
-        $filter_ary  = array_filter($ary);
-        $prev_folder = null;
-
-        if (is_array($filter_ary))
-        {
-            foreach ($filter_ary as $key => $folder)
-            {
-                $create_folder = empty($prev_folder) ? $folder : $prev_folder . "/{$folder}";
-                $prev_folder   = $create_folder;
-
-                $real    = realpath($create_folder);
-                $isexist = file_exists($real);
-
-                if ($isexist)
-                {
-                    continue;
-                }
-
-                $mkresult = mkdir($create_folder, $this->pathaccess);
-
-                if ($mkresult === false)
-                {
-                    throw new \Exception("嘗試建立路徑失敗：" . $folder);
-                }
-            }
-        }
-    }
-
-    //準備好路徑
-    private function setUplPath()
-    {
-        //指定路徑若不存在，就分解並依序往下檢查、建立路徑(資料夾)
-
-        if (!file_exists($this->site))
-        {
-            $this->createFolder($this->site);
-        }
-
-        //取得真實路徑
-        $realpath = realpath($this->site);
-
-        if (!is_writable($realpath))
-        {
-            $perms = fileperms($realpath); //權限值10進位
-            $perms = decoct($perms);       //10進未轉8進位
-            $perms = substr($perms, -4);   //取得後方4位的權值
-
-            throw new \Exception("不可寫入：{$this->site}，權值是：{$perms}");
         }
 
         return 1;
@@ -224,69 +107,69 @@ class Upload
         return "1";
     }
 
-    //驗證所有問題
-    private function checkAllError()
-    {
-        $filename      = $this->filename;
-        $arykey        = $this->arraykey;
-        $original_file = $_FILES[$filename]['name'][$arykey]; //原始檔名+附檔名
+    // //驗證所有問題
+    // private function checkAllError()
+    // {
+    //     $filename      = $this->filename;
+    //     $arykey        = $this->arraykey;
+    //     $original_file = $_FILES[$filename]['name'][$arykey]; //原始檔名+附檔名
 
-        //1.檢查錯誤代碼
-        $error = $this->getErrorCode();
+    //     //1.檢查錯誤代碼
+    //     $error = $this->getErrorCode();
 
-        if ($error != 0)
-        {
-            switch ($error)
-            {
-                case 4:
-                    throw new \Exception("請選擇檔案");
-                    break;
-            }
+    //     if ($error != 0)
+    //     {
+    //         switch ($error)
+    //         {
+    //             case 4:
+    //                 throw new \Exception("請選擇檔案");
+    //                 break;
+    //         }
 
-            throw new \Exception("上傳錯誤，代碼:{$error}");
-        }
+    //         throw new \Exception("上傳錯誤，代碼:{$error}");
+    //     }
 
-        //2.檢查附檔名黑、白名單
-        $bla       = $this->blacklist;
-        $whi       = $this->allow_type;
-        $blacklist = $this->checkBlackList();
-        $whitelist = $this->checkWhiteList();
+    //     //2.檢查附檔名黑、白名單
+    //     $bla       = $this->blacklist;
+    //     $whi       = $this->allow_type;
+    //     $blacklist = $this->checkBlackList();
+    //     $whitelist = $this->checkWhiteList();
 
-        if (!empty($bla) and !empty($whi))
-        {
-            throw new \Exception("黑、白名單請擇一設置。");
-        }
-        elseif (!empty($bla))
-        {
-            if ($blacklist == 0)
-            {
-                throw new \Exception("不允許的檔案型態 : {$original_file}");
-            }
-        }
-        elseif (!empty($whi))
-        {
-            if ($whitelist == 0)
-            {
-                throw new \Exception("不允許的檔案型態 : {$original_file}");
-            }
-        }
+    //     if (!empty($bla) and !empty($whi))
+    //     {
+    //         throw new \Exception("黑、白名單請擇一設置。");
+    //     }
+    //     elseif (!empty($bla))
+    //     {
+    //         if ($blacklist == 0)
+    //         {
+    //             throw new \Exception("不允許的檔案型態 : {$original_file}");
+    //         }
+    //     }
+    //     elseif (!empty($whi))
+    //     {
+    //         if ($whitelist == 0)
+    //         {
+    //             throw new \Exception("不允許的檔案型態 : {$original_file}");
+    //         }
+    //     }
 
-                                                                       //3.檔案大小
-        $filesize = $_FILES[$filename]['size'][$arykey] / 1000 / 1000; //上傳大小
-        $setsize  = $this->size;                                       //指定大小
-        $size     = $this->checkFileSize();
+    //                                                                    //3.檔案大小
+    //     $filesize = $_FILES[$filename]['size'][$arykey] / 1000 / 1000; //上傳大小
+    //     $setsize  = $this->size;                                       //指定大小
+    //     $size     = $this->checkFileSize();
 
-        if ($size == 0)
-        {
-            throw new \Exception("您的『{$original_file}』檔案大小： {$filesize} MB；超過指定大小 : {$setsize} MB");
-        }
+    //     if ($size == 0)
+    //     {
+    //         throw new \Exception("您的『{$original_file}』檔案大小： {$filesize} MB；超過指定大小 : {$setsize} MB");
+    //     }
 
-        //4.準備好存放路徑
-        $this->setUplPath();
+    //     //4.準備好存放路徑
+    //     $this->setUplPath();
 
-        //100.檢驗完成
-        return 1;
-    }
+    //     //100.檢驗完成
+    //     return 1;
+    // }
 
     //組合路徑與檔案完整名稱的字串
     private function mixPathAndFilename()
@@ -415,13 +298,17 @@ class Upload
             {
                 $this->newname = $N . "." . $this->filenameExtension(1);
 
-                //驗證無誤?
-                $prepare = $this->checkAllError();
-
-                if ($prepare != 1)
-                {
-                    return 0;
-                }
+                //驗證
+                $this->check->all(
+                    [
+                        'filename'    => $this->filename,
+                        'arykey'      => $this->arraykey,
+                        'blacklist'   => $this->blacklist,
+                        'allow_type'  => $this->allow_type,
+                        'filenameExt' => $this->filenameExtension(1),
+                        'setSize'     => $this->size,
+                        'site'        => $this->site,
+                    ]);
 
                 $tmp = $_FILES['upl']['tmp_name'][0];
 
@@ -456,13 +343,17 @@ class Upload
     {
         $this->newname = $newname; //建議：新檔名(時間+鍵值+副檔名)
 
-        //驗證無誤?
-        $prepare = $this->checkAllError();
-
-        if ($prepare != 1)
-        {
-            return 0;
-        }
+        //驗證
+        $this->check->all(
+            [
+                'filename'    => $this->filename,
+                'arykey'      => $this->arraykey,
+                'blacklist'   => $this->blacklist,
+                'allow_type'  => $this->allow_type,
+                'filenameExt' => $this->filenameExtension(1),
+                'setSize'     => $this->size,
+                'site'        => $this->site,
+            ]);
 
         $this->uploadStart(); //開始上傳
 
