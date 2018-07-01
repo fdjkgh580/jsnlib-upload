@@ -24,6 +24,60 @@ class Check
         return true;
     }
 
+    private function inList($orgFileName, $filenameExt, $blacklist, $allowlist)
+    {
+        // 在黑名單？
+        $isInBlackList = $this->isInBlackList($filenameExt, $blacklist);
+
+        // 在白名單？
+        $isInAllowType = $this->isInAllowType($filenameExt, $allowlist);
+
+        if (!empty($blacklist) and !empty($allowlist))
+        {
+            throw new \Exception("黑、白名單請擇一設置。");
+        }
+        // 若在黑名單中
+        elseif (!empty($blacklist) and $isInBlackList === true)
+        {
+            throw new \Exception("不允許的檔案型態 : {$orgFileName}");
+        }
+        // 若不在白名單中
+        elseif (!empty($allowlist) and $isInAllowType === false)
+        {
+            throw new \Exception("不允許的檔案型態 : {$orgFileName}");
+        }
+    }
+
+    private function filesCode($filename, $arykey)
+    {
+        // 檢查錯誤代碼
+        $error = $this->getFileErrorCode($filename, $arykey);
+
+        if ($error != 0)
+        {
+            switch ($error)
+            {
+                case 4:
+                    throw new \Exception("請選擇檔案");
+                    break;
+            }
+
+            throw new \Exception("上傳錯誤，代碼:{$error}");
+        }
+    }
+
+    private function size($filename, $arykey, $setSize, $orgFileName)
+    {
+        $filesize      = $_FILES[$filename]['size'][$arykey] / 1000 / 1000; //上傳大小
+        $allowFileSize = $this->allowFileSize($filename, $arykey, $setSize);
+
+        if ($allowFileSize === false)
+        {
+            throw new \Exception("您的 『{$orgFileName}』 檔案大小： {$filesize} MB；超過指定大小 : {$setSize} MB");
+        }
+    }
+
+
     /**
      * 驗證所有問題
      * @param $param['filename']
@@ -46,49 +100,15 @@ class Check
         $orgFileName = $_FILES[$filename]['name'][$arykey];
 
         // 檢查錯誤代碼
-        $error = $this->getFileErrorCode($filename, $arykey);
+        $this->filesCode($filename, $arykey);
 
-        if ($error != 0)
-        {
-            switch ($error)
-            {
-                case 4:
-                    throw new \Exception("請選擇檔案");
-                    break;
-            }
+        // 檢查允許或不允許的名單
+        $this->inList($orgFileName, $filenameExt, $blacklist, $allowlist);
+        
+        //檔案大小
+        $this->size($filename, $arykey, $setSize, $orgFileName);
 
-            throw new \Exception("上傳錯誤，代碼:{$error}");
-        }
-
-        // 在黑名單？
-        $isInBlackList = $this->isInBlackList($filenameExt, $blacklist);
-
-        // 在白名單？
-        $isInAllowType = $this->isInAllowType($filenameExt, $allowlist);
-
-        if (!empty($blacklist) and !empty($allowlist))
-        {
-            throw new \Exception("黑、白名單請擇一設置。");
-        }
-        // 若在黑名單中
-        elseif (!empty($blacklist) and $isInBlackList === true)
-        {
-            throw new \Exception("不允許的檔案型態 : {$orgFileName}");
-        }
-        // 若不在白名單中
-        elseif (!empty($allowlist) and $isInAllowType === false)
-        {
-            throw new \Exception("不允許的檔案型態 : {$orgFileName}");
-        }
-
-                                                                            //檔案大小
-        $filesize      = $_FILES[$filename]['size'][$arykey] / 1000 / 1000; //上傳大小
-        $allowFileSize = $this->allowFileSize($filename, $arykey, $setSize);
-
-        if ($allowFileSize === false)
-        {
-            throw new \Exception("您的 『{$orgFileName}』 檔案大小： {$filesize} MB；超過指定大小 : {$setSize} MB");
-        }
+        
 
         // 準備好存放路徑
         $this->setUplPath($site);
