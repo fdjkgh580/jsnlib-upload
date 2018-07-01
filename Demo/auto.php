@@ -27,19 +27,19 @@ try
             [
                 'prefix'   => 'MY',
                 'url'      => 'http://localhost/edit_my_jsnlib_system/jsnlib-upload/Demo/',
-                'sizelist' =>
-                [
-                    [
-                        'size'   => "S",
-                        'width'  => 150,
-                        'height' => 150,
-                    ],
-                    [
-                        'size'   => "M",
-                        'width'  => 800,
-                        'height' => 800,
-                    ],
-                ],
+                // 'sizelist' =>
+                // [
+                //     [
+                //         'size'   => "S",
+                //         'width'  => 150,
+                //         'height' => 150,
+                //     ],
+                //     [
+                //         'size'   => "M",
+                //         'width'  => 800,
+                //         'height' => 800,
+                //     ],
+                // ],
 
             ]);
 

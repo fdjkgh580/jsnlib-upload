@@ -43,11 +43,13 @@ class Upload
     //上傳檔案的副檔名  $Lower=1全部轉成小寫
     public function filenameExtension($lower = 0)
     {
-        $arykey      = $this->arraykey;
-        $name        = $this->filename;
-        $name        = $_FILES[$name]['name'][$arykey];
-        $filenameExt = strrchr($name, "."); //最後出現的後方字串
-        $filenameExt = ltrim($filenameExt, ".");
+        $arykey = $this->arraykey;
+        $name   = $this->filename;
+        $name   = $_FILES[$name]['name'][$arykey];
+        // $filenameExt = strrchr($name, "."); //最後出現的後方字串
+        // $filenameExt = ltrim($filenameExt, ".");
+        $pinfo       = pathinfo($name);
+        $filenameExt = $pinfo['extension'];
 
         if ($lower == "1")
         {
@@ -308,6 +310,11 @@ class Upload
         //上傳完整路徑
         $site = $this->mixPathAndFilename();
 
+        if (!file_exists($filetemp))
+        {
+            throw new \Exception("系統錯誤，找不到上傳的暫存檔。");
+        }
+
         if (copy($filetemp, $site))
         {
             return 1;
@@ -371,15 +378,15 @@ class Upload
         $prefix    = isset($param['prefix']) ? $param['prefix'] : $rand->get(4, "2");
         $returnbox = [];
 
-        //$val為原始上傳的文件名稱，若要將檔名使用原始檔名，建議配合uniqid()
-        foreach ($_FILES[$this->filename]["name"] as $fkey => $val)
+        // $org_filename 為原始上傳的文件名稱，若要將檔名使用原始檔名，建議配合uniqid()
+        foreach ($_FILES[$this->filename]["name"] as $fkey => $org_filename)
         {
-            if ($this->isNextKey($val))
+            if ($this->isNextKey($org_filename))
             {
                 continue;
             }
-            //不限數量 (遇到未指定的就換下一個<input>)
 
+            //不限數量 (遇到未指定的就換下一個<input>)
             $N = $prefix . "_" . $rand->get(4, "2") . "_" . time();
 
             if ($sizelist != false)
@@ -403,6 +410,22 @@ class Upload
             {
                 $this->newname = $N . "." . $this->filenameExtension(1);
 
+                //驗證無誤?
+                $prepare = $this->checkAllError();
+
+                if ($prepare != 1)
+                {
+                    return 0;
+                }
+
+                $tmp = $_FILES['upl']['tmp_name'][0];
+
+                //開始上傳
+                $this->uploadStart();
+
+                //清空暫存
+                $this->uploadEnd();
+
                 // 回傳格式
                 $back = $this->backFormat($param['url']);
 
@@ -413,6 +436,11 @@ class Upload
         return $returnbox;
     }
 
+    /**
+     * 上傳成功回傳的格式
+     * @param  string  $url 帶入指定網址，可以是非上傳的實際路徑
+     * @return array
+     */
     private function backFormat($url)
     {
         if (empty($this->newname))
@@ -434,11 +462,13 @@ class Upload
         return $back;
     }
 
-    //傳遞參數陣列
-    // $newname : 檔名
-    // $add_arraykey : input name 陣列起鍵值, 通常是從頭開始所以填0
-    // $resizeImg : 是否啟用縮圖
-    // $endupload : 對於暫存檔的使用。clean為清空、retain為保留
+    /**
+     * 傳遞參數陣列
+     * @param string  $newname      檔名
+     * @param integer $add_arraykey 陣列起鍵值, 通常是從頭開始所以填0
+     * @param integer $resizeImg    是否啟用縮圖
+     * @param string  $endupload    對於暫存檔的使用。clean為清空、retain為保留
+     */
     public function fileuploadMulti($newname, $add_arraykey, $resizeImg = 0, $endupload)
     {
         $this->newname = $newname; //建議：新檔名(時間+鍵值+副檔名)
