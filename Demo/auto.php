@@ -22,7 +22,7 @@ try
         $U->resizeImageScriptPath = "../plugin/ImageResize.php"; //套件ImageResize 路徑    (可相對於class jsnupload 的位置)
         $U->resize_width          = 400;                         //若要不同的size就在下方each的時候再填寫即可
         $U->resize_height         = 400;
-        $U->resize_quality        = 100; //JPG壓縮品質
+        $U->resize_quality        = 20; //JPG壓縮品質
 
         $result = $U->fileupload(
             [

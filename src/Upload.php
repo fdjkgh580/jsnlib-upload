@@ -35,6 +35,7 @@ class Upload
         $this->resize_quality = 100;
         $this->check          = new \Jsnlib\Upload\Check();
         $this->format         = new \Jsnlib\Upload\Format();
+        $this->image          = new \Jsnlib\Upload\Image();
     }
 
     //遇到未指定上傳檔案的就換下一個<input>
@@ -83,30 +84,6 @@ class Upload
         $filetemp = $_FILES[$name]['tmp_name'][$arykey];
 
         unlink($filetemp);
-        return 1;
-    }
-
-    //重新變更圖片大小
-    private function resizeImage($ImageResizeScriptPath)
-    {
-        include_once $ImageResizeScriptPath;
-
-        // 驗證檔案的指定型態
-        $this->check->fileType($this->filename, $this->arraykey, "image");
-
-        $site   = $this->format->mixPathAndFilename($this->newname, $this->site);
-        $neww   = $this->resize_width;
-        $newh   = $this->resize_height;
-        $retype = $this->resize_type;
-        $req    = $this->resize_quality;
-
-        $result = ImageResize($site, $site, $neww, $newh, $retype, $req); //成功返回存放路徑 失敗返回false
-
-        if (!$result)
-        {
-            return 0;
-        }
-
         return 1;
     }
 
@@ -223,10 +200,20 @@ class Upload
         //調整圖片大小(已寫自動判定格式)
         if ($resizeImg == 1)
         {
-            $Scpath   = $this->resizeImageScriptPath; //套件路徑
-            $resultRE = $this->resizeImage($Scpath);
+            $resultRE = $this->image->resize(
+                [
+                    'imageResizeScriptPath' => $this->resizeImageScriptPath,
+                    'filename'              => $this->filename,
+                    'arraykey'              => $this->arraykey,
+                    'newname'               => $this->newname,
+                    'site'                  => $this->site,
+                    'resize_width'          => $this->resize_width,
+                    'resize_height'         => $this->resize_height,
+                    'resize_type'           => $this->resize_type,
+                    'resize_quality'        => $this->resize_quality,
+                ]);
 
-            if ($resultRE != 1)
+            if ($resultRE != true)
             {
                 echo ("調整錯誤，圖片仍保持原始大小");
             }
