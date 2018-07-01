@@ -270,6 +270,7 @@ class Upload
                 throw new \Exception("不允許的檔案型態 : {$original_file}");
             }
         }
+
                                                                        //3.檔案大小
         $filesize = $_FILES[$filename]['size'][$arykey] / 1000 / 1000; //上傳大小
         $setsize  = $this->size;                                       //指定大小
