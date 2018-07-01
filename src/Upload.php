@@ -36,6 +36,7 @@ class Upload
         $this->check          = new \Jsnlib\Upload\Check();
         $this->format         = new \Jsnlib\Upload\Format();
         $this->image          = new \Jsnlib\Upload\Image();
+        $this->rand           = new \Jsnlib\Rand();
     }
 
     //遇到未指定上傳檔案的就換下一個<input>
@@ -101,6 +102,63 @@ class Upload
         }
     }
 
+    private function resizeImage($fkey, $nameString, $url, &$returnbox, $sizelist)
+    {
+        foreach ($sizelist as $key => $info)
+        {
+            $endupload = (!isset($sizelist[$key + 1])) ? "clean" : "retain";
+
+            $newname             = $nameString . "_" . $info['size'] . "." . $this->format->filenameExtension($this->filename, $this->arraykey);
+            $this->resize_width  = $info['width'];
+            $this->resize_height = $info['height'];
+            $this->fileuploadMulti($newname, $this->arraykey, 1, $endupload);
+
+            // 回傳格式
+            $back = $this->format->back(
+                $this->newname,
+                $this->format->mixPathAndFilename($this->newname, $this->site),
+                $url
+            );
+
+            $returnbox[$fkey][$info['size']] = $back;
+        }
+    }
+
+    private function simpleFile($fkey, $nameString, $url, &$returnbox)
+    {
+        $this->newname = $nameString . "." . $this->format->filenameExtension($this->filename, $this->arraykey);
+
+        //驗證
+        $this->check->all(
+            [
+                'filename'    => $this->filename,
+                'arykey'      => $this->arraykey,
+                'blacklist'   => $this->blacklist,
+                'allow_type'  => $this->allow_type,
+                'filenameExt' => $this->format->filenameExtension($this->filename, $this->arraykey),
+                'setSize'     => $this->size,
+                'site'        => $this->site,
+            ]);
+
+        $tmp = $_FILES['upl']['tmp_name'][0];
+
+        //開始上傳
+        $this->start();
+
+        //清空暫存
+        $this->end();
+
+        // 回傳格式
+        $back = $this->format->back(
+            $this->newname,
+            $this->format->mixPathAndFilename($this->newname, $this->site),
+            $url
+        );
+
+        $returnbox[$fkey] = $back;
+    }
+    
+
     /**
      * 依照尺寸自動上傳，並自動命名
      * @param $param['prefix']             選)前贅字，若不指定將自動編排 4 字
@@ -111,70 +169,25 @@ class Upload
      */
     public function fileupload($param)
     {
-        $rand      = new \Jsnlib\Rand();
         $sizelist  = isset($param['sizelist']) ? $param['sizelist'] : false;
-        $prefix    = isset($param['prefix']) ? $param['prefix'] : $rand->get(4, "2");
+        $prefix    = isset($param['prefix']) ? $param['prefix'] : $this->rand->get(4, "2");
         $returnbox = [];
 
-        $this->eachFiles(function ($fkey, $org_filename) use ($param, $rand, $sizelist, $prefix, &$returnbox)
+        $this->eachFiles(function ($fkey, $org_filename) use ($param, $sizelist, $prefix, &$returnbox)
         {
             //不限數量 (遇到未指定的就換下一個<input>)
-            $N = $prefix . "_" . $rand->get(4, "2") . "_" . time();
+            $nameString = $this->format->newNameString($prefix);
 
-            if ($sizelist != false)
+            // 若有指定縮小列表
+            if (is_array($sizelist))
             {
-                foreach ($sizelist as $key => $info)
-                {
-                    $endupload = (!isset($sizelist[$key + 1])) ? "clean" : "retain";
-
-                    $newname             = $N . "_" . $info['size'] . "." . $this->format->filenameExtension($this->filename, $this->arraykey);
-                    $this->resize_width  = $info['width'];
-                    $this->resize_height = $info['height'];
-                    $this->fileuploadMulti($newname, $this->arraykey, 1, $endupload);
-
-                    // 回傳格式
-                    $back = $this->format->back(
-                        $this->newname,
-                        $this->format->mixPathAndFilename($this->newname, $this->site),
-                        $param['url']
-                    );
-
-                    $returnbox[$fkey][$info['size']] = $back;
-                }
+                $this->resizeImage($fkey, $nameString, $param['url'], $returnbox, $sizelist);
+                return true;
             }
-            else
-            {
-                $this->newname = $N . "." . $this->format->filenameExtension($this->filename, $this->arraykey);
 
-                //驗證
-                $this->check->all(
-                    [
-                        'filename'    => $this->filename,
-                        'arykey'      => $this->arraykey,
-                        'blacklist'   => $this->blacklist,
-                        'allow_type'  => $this->allow_type,
-                        'filenameExt' => $this->format->filenameExtension($this->filename, $this->arraykey),
-                        'setSize'     => $this->size,
-                        'site'        => $this->site,
-                    ]);
+            // 一般檔案上傳
+            $this->simpleFile($fkey, $nameString, $param['url'], $returnbox);
 
-                $tmp = $_FILES['upl']['tmp_name'][0];
-
-                //開始上傳
-                $this->start();
-
-                //清空暫存
-                $this->end();
-
-                // 回傳格式
-                $back = $this->format->back(
-                    $this->newname,
-                    $this->format->mixPathAndFilename($this->newname, $this->site),
-                    $param['url']
-                );
-
-                $returnbox[$fkey] = $back;
-            }
         });
 
         return $returnbox;
