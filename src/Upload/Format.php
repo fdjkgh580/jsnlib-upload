@@ -35,7 +35,7 @@ class Format
     {
         $this->rand           = new \Jsnlib\Rand();
         
-        return $prefix . "_" . $this->rand->get(4, "2") . "_" . time();
+        return $prefix . "_" . $this->rand->get(4, [2])[0] . "_" . time();
     }
 
     /**

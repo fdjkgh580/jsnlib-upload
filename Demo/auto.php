@@ -14,7 +14,7 @@ try
         $inputname                = "upl";                       //設定input file 的名稱, upl代表了 name="upl[]"
         $U->filename              = $inputname;                  //input name屬性的陣列名稱
         $U->arraykey              = 0;                           //input name陣列鍵值(起始值)
-        $U->allowlist             = "jpg,sql";                   //允許副檔名
+        $U->allowlist             = "jpg,png";                   //允許副檔名
         $U->blacklist             = null;                        //
         $U->pathaccess            = "0777";                      //路徑權限
         $U->size                  = 20;                          //MB
