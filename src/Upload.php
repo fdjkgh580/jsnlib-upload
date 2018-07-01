@@ -37,80 +37,17 @@ class Upload
         $this->format         = new \Jsnlib\Upload\Format();
     }
 
-    //上傳檔案的副檔名  $Lower=1全部轉成小寫
-    public function filenameExtension($lower = 0)
-    {
-        $arykey = $this->arraykey;
-        $name   = $this->filename;
-        $name   = $_FILES[$name]['name'][$arykey];
-        // $filenameExt = strrchr($name, "."); //最後出現的後方字串
-        // $filenameExt = ltrim($filenameExt, ".");
-        $pinfo       = pathinfo($name);
-        $filenameExt = $pinfo['extension'];
-
-        if ($lower == "1")
-        {
-            $filenameExt = strtolower($filenameExt);
-        }
-
-        //小寫
-        return $filenameExt;
-    }
-
-    //驗證檔案的指定型態
-    private function checkFileType($needtype)
-    {
-        $name   = $this->filename;
-        $arykey = $this->arraykey;
-        $type   = $_FILES[$name]['type'][$arykey];
-        $type   = strtok($type, "/"); //分割字串
-
-        if ($type != $needtype)
-        {
-            return 0;
-        }
-
-        return 1;
-    }
-
-    //讓字串結尾保持 「 / 」
-    private function keepEndSlash($string)
-    {
-        $endstr = substr($string, -1);
-        $token  = "/";
-
-        if ($endstr == $token)
-        {
-            unset($token);
-            return $string;
-        }
-
-        return $string . $token;
-    }
-
     //遇到未指定上傳檔案的就換下一個<input>
     public function isNextKey($key)
     {
         if (!empty($key))
         {
-            return "0";
+            return false;
         }
 
         $this->arraykey += 1;
 
-        return "1";
-    }
-
-    //組合路徑與檔案完整名稱的字串
-    private function mixPathAndFilename()
-    {
-        //指定位置
-        $newname = $this->newname;
-
-        //檢查並自動幫site結尾補上/
-        $this->site = $this->keepEndSlash($this->site);
-
-        return $this->site . $newname;
+        return true;
     }
 
     //開始上傳
@@ -122,7 +59,7 @@ class Upload
         $filetemp = $_FILES[$name]['tmp_name'][$arykey];
 
         //上傳完整路徑
-        $site = $this->mixPathAndFilename();
+        $site = $this->format->mixPathAndFilename($this->newname, $this->site);
 
         if (!file_exists($filetemp))
         {
@@ -154,14 +91,10 @@ class Upload
     {
         include_once $ImageResizeScriptPath;
 
-        $chktype = $this->checkFileType("image");
+        // 驗證檔案的指定型態
+        $this->check->fileType($this->filename, $this->arraykey, "image");
 
-        if ($chktype == 0)
-        {
-            throw new \Exception("檔案非圖片格式類型，不可調整大小");
-        }
-
-        $site   = $this->mixPathAndFilename();
+        $site   = $this->format->mixPathAndFilename($this->newname, $this->site);
         $neww   = $this->resize_width;
         $newh   = $this->resize_height;
         $retype = $this->resize_type;
@@ -209,7 +142,7 @@ class Upload
                 {
                     $endupload = (!isset($sizelist[$key + 1])) ? "clean" : "retain";
 
-                    $newname             = $N . "_" . $info['size'] . "." . $this->filenameExtension(1);
+                    $newname             = $N . "_" . $info['size'] . "." . $this->format->filenameExtension($this->filename, $this->arraykey);
                     $this->resize_width  = $info['width'];
                     $this->resize_height = $info['height'];
                     $this->fileuploadMulti($newname, $this->arraykey, 1, $endupload);
@@ -217,7 +150,7 @@ class Upload
                     // 回傳格式
                     $back = $this->format->back(
                         $this->newname,
-                        $this->mixPathAndFilename(),
+                        $this->format->mixPathAndFilename($this->newname, $this->site),
                         $param['url']
                     );
 
@@ -226,7 +159,7 @@ class Upload
             }
             else
             {
-                $this->newname = $N . "." . $this->filenameExtension(1);
+                $this->newname = $N . "." . $this->format->filenameExtension($this->filename, $this->arraykey);
 
                 //驗證
                 $this->check->all(
@@ -235,7 +168,7 @@ class Upload
                         'arykey'      => $this->arraykey,
                         'blacklist'   => $this->blacklist,
                         'allow_type'  => $this->allow_type,
-                        'filenameExt' => $this->filenameExtension(1),
+                        'filenameExt' => $this->format->filenameExtension($this->filename, $this->arraykey),
                         'setSize'     => $this->size,
                         'site'        => $this->site,
                     ]);
@@ -251,7 +184,7 @@ class Upload
                 // 回傳格式
                 $back = $this->format->back(
                     $this->newname,
-                    $this->mixPathAndFilename(),
+                    $this->format->mixPathAndFilename($this->newname, $this->site),
                     $param['url']
                 );
 
@@ -280,7 +213,7 @@ class Upload
                 'arykey'      => $this->arraykey,
                 'blacklist'   => $this->blacklist,
                 'allow_type'  => $this->allow_type,
-                'filenameExt' => $this->filenameExtension(1),
+                'filenameExt' => $this->format->filenameExtension($this->filename, $this->arraykey),
                 'setSize'     => $this->size,
                 'site'        => $this->site,
             ]);

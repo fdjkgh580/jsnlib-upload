@@ -5,9 +5,24 @@ class Check
 {
     protected $upload;
 
-    public function __construct()
+    /**
+     * 驗證檔案的指定型態
+     * @param $filename
+     * @param $arykey
+     * @param $needType 要符合的型態
+     */
+    public function fileType($filename, $arykey, $needType)
     {
+        $type = $_FILES[$filename]['type'][$arykey];
+        $type = strtok($type, "/"); //分割字串
+
+        if ($type !== $needType)
+        {
+            throw new \Exception("檔案非圖片格式類型，不可調整大小");
         }
+
+        return true;
+    }
 
     /**
      * 驗證所有問題
@@ -28,7 +43,7 @@ class Check
         }
 
         // 原始檔名 + 附檔名
-        $orgFileName = $_FILES[$filename]['name'][$arykey]; 
+        $orgFileName = $_FILES[$filename]['name'][$arykey];
 
         // 檢查錯誤代碼
         $error = $this->getFileErrorCode($filename, $arykey);
@@ -138,7 +153,6 @@ class Check
         }
     }
 
-
     //取得 $_FILES 錯誤代碼
     private function getFileErrorCode($filename, $arykey)
     {
@@ -196,7 +210,7 @@ class Check
      * 檢查檔案大小
      * @param  string $filename
      * @param  int    $arykey
-     * @param  int    $setSize  指定的檔案大小
+     * @param  int    $setSize    指定的檔案大小
      * @return bool
      */
     private function allowFileSize($filename, $arykey, $setSize)
