@@ -124,7 +124,7 @@ class Upload
         }
     }
 
-    private function simpleFile($fkey, $nameString, $url, &$returnbox)
+    private function simpleFile($nameString, $url, &$returnbox)
     {
         $this->newname = $nameString . "." . $this->format->filenameExtension($this->filename, $this->arraykey);
 
@@ -150,7 +150,7 @@ class Upload
             $url
         );
 
-        $returnbox[$fkey] = $back;
+        $returnbox[$this->arraykey] = $back;
     }
 
     /**
@@ -181,7 +181,8 @@ class Upload
             }
 
             // 一般檔案上傳
-            $this->simpleFile($fkey, $nameString, $url, $returnbox);
+            $this->arraykey = $fkey;
+            $this->simpleFile($nameString, $url, $returnbox);
         });
 
         return $returnbox;
