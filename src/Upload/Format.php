@@ -26,6 +26,9 @@ class Format
         if (isset($url))
         {
             $back['url'] = trim($url, "\ /") . "/" . $path;
+
+            // 替換相對路徑寫法
+            $back['url'] = str_replace("../", null, $back['url']);
         }
 
         return $back;
