@@ -140,13 +140,8 @@ class Upload
                 'site'        => $this->site,
             ]);
 
-        $tmp = $_FILES['upl']['tmp_name'][0];
-
         //開始上傳
         $this->start();
-
-        //清空暫存
-        $this->end();
 
         // 回傳格式
         $back = $this->format->back(
